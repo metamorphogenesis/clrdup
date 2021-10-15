@@ -1,0 +1,106 @@
+            //test quadrant I
+            test(0, max);
+            test(0, maxLeft);
+            test(1, max);
+            test(1, maxLeft);
+            test(500_000_000, max);
+            test(500_000_000, maxLeft);
+            test(1_000_000_000, max);
+            test(1_000_000_000, maxLeft);
+            test(1_500_000_000, max);
+            test(1_500_000_000, maxLeft);
+            test(2_000_000_000, max);
+            test(2_000_000_000, maxLeft);
+            test(maxLeft, max);
+            test(maxLeft, maxLeft);
+
+            test(max, max);
+            test(max, maxLeft);
+            test(max, 2_000_000_000);
+            test(maxLeft, 2_000_000_000);
+            test(max, 1_500_000_000);
+            test(maxLeft, 1_500_000_000);
+            test(max, 1_000_000_000);
+            test(maxLeft, 1_000_000_000);
+            test(max, 500_000_000);
+            test(maxLeft, 500_000_000);
+            test(max, 1);
+            test(maxLeft, 1);
+            test(max, 0);
+            test(maxLeft, 0);
+
+            test(2_000_000_000, 0);
+            test(2_000_000_000, 1);
+            test(1_500_000_000, 0);
+            test(1_500_000_000, 1);
+            test(1_000_000_000, 0);
+            test(1_000_000_000, 1);
+            test(500_000_000, 0);
+            test(500_000_000, 1);
+            test(1, 0);
+            test(0, 0);
+            test(0, 1);
+            test(1, 1);
+
+            test(0, 500_000_000);
+            test(1, 500_000_000);
+            test(0, 1_000_000_000);
+            test(1, 1_000_000_000);
+            test(0, 1_500_000_000);
+            test(1, 1_500_000_000);
+            test(0, 2_000_000_000);
+            test(1, 2_000_000_000);
+
+            //test quadrant III
+            test(min, -1);
+            test(min, -2);
+            test(minRight, -1);
+            test(minRight, -2);
+            test(-2_000_000_000, -1);
+            test(-2_000_000_000, -2);
+            test(-1_500_000_000, -1);
+            test(-1_500_000_000, -2);
+            test(-1_000_000_000, -1);
+            test(-1_000_000_000, -2);
+            test(-500_000_000, -1);
+            test(-500_000_000, -2);
+            test(-2, -1);
+            test(-2, -2);
+            test(-1, -1);
+            test(-1, -2);
+            
+            test(-1, -500_000_000);
+            test(-2, -500_000_000);
+            test(-1, -1_000_000_000);
+            test(-2, -1_000_000_000);
+            test(-1, -1_500_000_000);
+            test(-2, -1_500_000_000);
+            test(-1, -2_000_000_000);
+            test(-2, -2_000_000_000);
+            test(-1, minRight);
+            test(-2, minRight);
+            test(-1, min);
+            test(-2, min);
+> DUPLICATE:}
+> DUPLICATE:}
+            test(-500_000_000, min);
+            test(-500_000_000, minRight);
+            test(-1_000_000_000, min);
+            test(-1_000_000_000, minRight);
+            test(-1_500_000_000, min);
+            test(-1_500_000_000, minRight);
+            test(-2_000_000_000, min);
+            test(-2_000_000_000, minRight);
+            test(minRight, min);
+            test(minRight, minRight);
+            test(min, min);
+            test(min, minRight);
+
+            test(min, -2_000_000_000);
+            test(minRight, -2_000_000_000);
+            test(min, -1_500_000_000);
+            test(minRight, -1_500_000_000);
+            test(min, -1_000_000_000);
+            test(minRight, -1_000_000_000);
+            test(min, -500_000_000);
+            test(minRight, -500_000_000);
