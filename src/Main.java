@@ -4,18 +4,21 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
 
+import static java.lang.Math.*;
+
 public class Main {
-    private static final String CLR_RESET = "\u001B[0m";
+    private static final String RESET = "\u001B[0m";
+    private static final String FNT_ITALIC = "\u001B[3m";
     private static final String CLR_RED = "\u001B[91m";
     private static final String CLR_YELLOW = "\u001B[93m";
     private static final String CLR_GREEN = "\u001B[92m";
     private static final String CLR_BLUE = "\u001B[94m";
     private static final String CLR_GRAY = "\u001B[90m";
-    private static final String CLR_WHITE = "\u001B[37m";
-    private static final String CLR_BLACK = "\u001B[30m";
-    private static final String BCK_BLACK = "\u001B[49m";
-    private static final String BCK_YELLOW = "\u001B[43m";
-    private static final String BCK_GREEN = "\u001B[42m";
+//    private static final String CLR_WHITE = "\u001B[37m";
+//    private static final String CLR_BLACK = "\u001B[30m";
+//    private static final String BCK_BLACK = "\u001B[49m";
+//    private static final String BCK_YELLOW = "\u001B[43m";
+//    private static final String BCK_GREEN = "\u001B[42m";
 
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
@@ -27,11 +30,11 @@ public class Main {
             try {
                 threshold = Integer.parseInt(args[0]);
             } catch (NumberFormatException e) {
-                System.out.print(CLR_RESET + "Type minimal string length: " + CLR_BLUE);
+                System.out.print(RESET + "Type minimal string length: " + CLR_BLUE);
                 threshold = scanner.nextInt();
             }
         } else {
-            System.out.print(CLR_RESET + "Type minimal string length: " + CLR_BLUE);
+            System.out.print(RESET + "Type minimal string length: " + CLR_BLUE);
             threshold = scanner.nextInt();
         }
         scanner.close();
@@ -40,9 +43,9 @@ public class Main {
         try {
             parse(sourceFile, threshold);
         } catch (FileNotFoundException e) {
-            System.out.println(CLR_RED + "\n     File or directory not found." + CLR_RESET + "\n");
+            System.out.println(CLR_RED + "\n\tFile or directory not found." + RESET + "\n");
         } catch (IOException e) {
-            System.out.println(CLR_RED + "\n     Unable to read/write file." + CLR_RESET + "\n");
+            System.out.println(CLR_RED + "\n\tUnable to read/write file." + RESET + "\n");
         }
     }
 
@@ -52,6 +55,8 @@ public class Main {
         HashMap<String, Integer> all = new HashMap<>();
         Scanner scanner = new Scanner(sourceFile);
         int duplicates = 0;
+        int maxLength = 0;
+        int maxCount = 0;
 
         while (scanner.hasNext()) {
             String line = scanner.nextLine();
@@ -63,8 +68,16 @@ public class Main {
                 unique.add(line);
             }
 
-            if (all.containsKey(line)) {
+            if (all.containsKey(line) && line.length() >= threshold) {
                 all.put(line, all.get(line) + 1);
+
+                if (all.get(line) > maxCount) {
+                    maxCount = all.get(line);
+                }
+
+                if (line.length() > maxLength) {
+                    maxLength = line.length();
+                }
             } else {
                 all.put(line, 1);
             }
@@ -85,27 +98,30 @@ public class Main {
                 writer.write(line + "\n");
             }
             writer.close();
-            System.out.println(CLR_GRAY + "\n---------------------------------------"
-                    + CLR_RESET + "\n Times:\t" + CLR_GRAY + "|" + CLR_RESET + "\tLine:\n"
-                    + CLR_GRAY + "---------------------------------------" + CLR_RESET);
+            maxCount = (int) (log10(maxCount)) + 1;
+            String separator = CLR_GRAY + "\t" + repeat("-", 11 + max(maxCount, 6) + max(maxLength, 5));
+            System.out.println("\n" + separator + "\n\t|" + RESET + FNT_ITALIC + "  Times:" + (maxCount - 4 < 2 ? "  " : repeat(" ", maxCount - 4)) + RESET + CLR_GRAY + "|"
+                    + RESET + FNT_ITALIC + "  Line:" + repeat(" ", max(maxLength - 3, 2)) + RESET + CLR_GRAY + "|\n" + separator + RESET);
 
             for (Map.Entry<String, Integer> entry : all.entrySet()) {
                 if (entry.getValue() > 1) {
-                    System.out.println(" " + entry.getValue() + "\t" + CLR_GRAY
-                            + "|" + CLR_RESET + "\t" + entry.getKey());
+                    String output = CLR_GRAY + "\t|  " + RESET + entry.getValue()
+                            + repeat(" ", max(8 - ((int) log10(entry.getValue()) + 1), maxCount + 2 - ((int) log10(entry.getValue()) + 1)))
+                            + CLR_GRAY + "|  " + RESET + entry.getKey() + repeat(" ", max(maxLength - entry.getKey().length() + 2, 7 - entry.getKey().length())) + CLR_GRAY + "|";
+                    System.out.println(output);
                 }
             }
-
-            System.out.println(CLR_GRAY + "---------------------------------------\n"
-                    + CLR_YELLOW + "\n     " + duplicates
-                    + " duplicated lines of " + lines.size() + " were found.     "
-                    + CLR_RESET + "\n     Unique lines: " + unique.size()
-                    + String.format(" (%,.2f", (double) unique.size() / lines.size() * 100) + "%)\n"
-                    + "\nFile with unique lines has been written with name "
-                    + sourceFile.getName() + CLR_YELLOW + "_clean" + CLR_RESET + ".\n");
+            System.out.println(CLR_GRAY + separator + "\n"
+                    + CLR_YELLOW + "\n\t" + duplicates
+                    + " duplicated lines" + RESET + " of " + lines.size() + " were found.     "
+                    + "\n\tUnique lines: " + unique.size() + String.format(" (%,.2f", (double) unique.size() / lines.size() * 100) + "%)\n"
+                    + "\nFile with unique lines has been written with name " + sourceFile.getName() + CLR_YELLOW + "_clean" + RESET + ".\n");
         } else {
-            System.out.println(CLR_GREEN + "\n     There is no duplicates in the file.     "
-                    + CLR_RESET + "\n");
+            System.out.println(CLR_GREEN + "\n\tThere is no duplicates in the file.     " + RESET + "\n");
         }
+    }
+
+    private static String repeat(String pattern, int count) {
+        return pattern.repeat(count);
     }
 }
