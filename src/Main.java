@@ -1,51 +1,63 @@
 import java.io.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Scanner;
+import java.util.*;
 
 import static java.lang.Math.*;
 
 public class Main {
     private static final String RESET = "\u001B[0m";
     private static final String FNT_ITALIC = "\u001B[3m";
-    private static final String CLR_RED = "\u001B[91m";
-    private static final String CLR_YELLOW = "\u001B[93m";
-    private static final String CLR_GREEN = "\u001B[92m";
-    private static final String CLR_BLUE = "\u001B[94m";
-    private static final String CLR_GRAY = "\u001B[90m";
-//    private static final String CLR_WHITE = "\u001B[37m";
-//    private static final String CLR_BLACK = "\u001B[30m";
-//    private static final String BCK_BLACK = "\u001B[49m";
-//    private static final String BCK_YELLOW = "\u001B[43m";
-//    private static final String BCK_GREEN = "\u001B[42m";
+    private static final String FG_RED = "\u001B[91m";
+    private static final String FG_YELLOW = "\u001B[38;5;208m";
+    private static final String FG_GREEN = "\u001B[92m";
+    private static final String FG_BLUE = "\u001B[38;5;33m";
+    private static final String FG_DK_GRAY = "\u001B[90m";
+    private static final String FG_GRAY = "\u001B[38;5;237m";
+    private static final String BG_HEADER = "\u001B[48;5;234m";
+    private static final String BG_EVEN = "\u001B[48;5;232m";
 
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
-        System.out.print("\nType full source file name: " + CLR_BLUE);
-        String sourceFileName = scanner.nextLine();
-        int threshold;
-
-        if (args.length > 0) {
-            try {
-                threshold = Integer.parseInt(args[0]);
-            } catch (NumberFormatException e) {
-                System.out.print(RESET + "Type minimal string length: " + CLR_BLUE);
-                threshold = scanner.nextInt();
-            }
-        } else {
-            System.out.print(RESET + "Type minimal string length: " + CLR_BLUE);
-            threshold = scanner.nextInt();
-        }
-        scanner.close();
-        File sourceFile = new File(sourceFileName);
+        String sourceFileName = null;
+        System.out.print("\nType full source file name: " + FG_BLUE);
 
         try {
-            parse(sourceFile, threshold);
-        } catch (FileNotFoundException e) {
-            System.out.println(CLR_RED + "\n\tFile or directory not found." + RESET + "\n");
-        } catch (IOException e) {
-            System.out.println(CLR_RED + "\n\tUnable to read/write file." + RESET + "\n");
+            sourceFileName = scanner.nextLine();
+        } catch (InputMismatchException e) {
+            System.out.println(RESET + FG_RED + "\n\tIncorrect input." + RESET + "\n");
+            System.exit(0);
+        }
+        File sourceFile = new File(sourceFileName);
+
+        if (!sourceFile.exists() || sourceFile.isDirectory()) {
+            System.out.println(RESET + FG_RED + "\n\tFile or directory not found." + RESET + "\n");
+        } else {
+            int threshold = 0;
+
+            try {
+                if (args.length > 0) {
+                    try {
+                        threshold = Integer.parseInt(args[0]);
+                    } catch (NumberFormatException e) {
+                        System.out.print(RESET + "Type sensitivity:           " + FG_BLUE);
+                        threshold = scanner.nextInt();
+                    }
+                } else {
+                    System.out.print(RESET + "Type sensitivity:           " + FG_BLUE);
+                    threshold = scanner.nextInt();
+                }
+                scanner.close();
+            } catch (InputMismatchException e) {
+                System.out.println(RESET + FG_RED + "\n\tIncorrect input." + RESET + "\n");
+                System.exit(0);
+            }
+
+            try {
+                parse(sourceFile, threshold);
+            } catch (FileNotFoundException e) {
+                System.out.println(RESET + FG_RED + "\n\tFile or directory not found." + RESET + "\n");
+            } catch (IOException e) {
+                System.out.println(RESET + FG_RED + "\n\tUnable to read/write file." + RESET + "\n");
+            }
         }
     }
 
@@ -99,25 +111,27 @@ public class Main {
             }
             writer.close();
             maxCount = (int) (log10(maxCount)) + 1;
-            String separator = CLR_GRAY + "\t" + repeat("-", 11 + max(maxCount, 6) + max(maxLength, 5));
-            System.out.println("\n" + separator + "\n\t|" + RESET + FNT_ITALIC + "  Times:" + (maxCount - 4 < 2 ? "  " : repeat(" ", maxCount - 4)) + RESET + CLR_GRAY + "|"
-                    + RESET + FNT_ITALIC + "  Line:" + repeat(" ", max(maxLength - 3, 2)) + RESET + CLR_GRAY + "|\n" + separator + RESET);
+            int lineParity = 0;
+            String separator = FG_GRAY + "\t" + repeat("-", 11 + max(maxCount, 6) + max(maxLength, 5));
+            System.out.println("\n" + separator + "\n\t|" + RESET + BG_HEADER + FNT_ITALIC + "  Times:" + (maxCount - 4 < 2 ? "  " : repeat(" ", maxCount - 4)) + RESET + FG_GRAY + "|"
+                    + RESET + BG_HEADER + FNT_ITALIC + "  Line:" + repeat(" ", max(maxLength - 3, 2)) + RESET + FG_GRAY + "|\n" + separator + RESET);
 
             for (Map.Entry<String, Integer> entry : all.entrySet()) {
                 if (entry.getValue() > 1) {
-                    String output = CLR_GRAY + "\t|  " + RESET + entry.getValue()
-                            + repeat(" ", max(8 - ((int) log10(entry.getValue()) + 1), maxCount + 2 - ((int) log10(entry.getValue()) + 1)))
-                            + CLR_GRAY + "|  " + RESET + entry.getKey() + repeat(" ", max(maxLength - entry.getKey().length() + 2, 7 - entry.getKey().length())) + CLR_GRAY + "|";
+                    String output = FG_GRAY + "\t|" + (lineParity % 2 == 0 ? RESET : RESET + BG_EVEN) + "  " + entry.getValue()
+                            + repeat(" ", max(8 - ((int) log10(entry.getValue()) + 1), maxCount + 2 - ((int) log10(entry.getValue()) + 1))) + RESET
+                            + FG_GRAY + "|" + (lineParity % 2 == 0 ? RESET : RESET + BG_EVEN) + "  " + entry.getKey() + repeat(" ", max(maxLength - entry.getKey().length() + 2, 7 - entry.getKey().length())) + RESET + FG_GRAY + "|";
                     System.out.println(output);
+                    lineParity++;
                 }
             }
-            System.out.println(CLR_GRAY + separator + "\n"
-                    + CLR_YELLOW + "\n\t" + duplicates
+            System.out.println(FG_DK_GRAY + separator + "\n"
+                    + FG_YELLOW + "\n\t" + duplicates
                     + " duplicated lines" + RESET + " of " + lines.size() + " were found.     "
                     + "\n\tUnique lines: " + unique.size() + String.format(" (%,.2f", (double) unique.size() / lines.size() * 100) + "%)\n"
-                    + "\nFile with unique lines has been written with name " + sourceFile.getName() + CLR_YELLOW + "_clean" + RESET + ".\n");
+                    + "\nFile with unique lines has been written with name " + sourceFile.getName() + FG_YELLOW + "_clean" + RESET + ".\n");
         } else {
-            System.out.println(CLR_GREEN + "\n\tThere is no duplicates in the file.     " + RESET + "\n");
+            System.out.println(FG_GREEN + "\n\tThere is no duplicates in the file.     " + RESET + "\n");
         }
     }
 
